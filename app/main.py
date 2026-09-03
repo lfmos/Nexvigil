@@ -5,6 +5,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
+from uuid import uuid4
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, status
@@ -91,13 +92,14 @@ def login(payload: LoginRequest, request: Request) -> LoginResponse:
     valid = demo_users.get(payload.username) == payload.password
 
     event = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "event_type": "authentication",
-        "action": "login",
-        "result": "success" if valid else "failed",
-        "username": payload.username,
-        "source_ip": client_ip,
-        "service": "nexvigil-lab-api",
+    "event_id": f"NV-EVT-{uuid4().hex}",
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+    "event_type": "authentication",
+    "action": "login",
+    "result": "success" if valid else "failed",
+    "username": payload.username,
+    "source_ip": client_ip,
+    "service": "nexvigil-lab-api",
     }
 
     # A senha nunca é incluída no evento.

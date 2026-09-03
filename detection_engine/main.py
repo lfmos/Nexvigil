@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -7,6 +8,11 @@ from pathlib import Path
 from detection_engine.detector import (
     detect_bruteforce,
     detect_success_after_failures,
+)
+from detection_engine.state import (
+    load_state,
+    prune_recent_events,
+    save_state,
 )
 
 
@@ -17,21 +23,41 @@ EVENT_FILE = ROOT / "logs" / "security_events.jsonl"
 ALERT_DIR = ROOT / "alerts"
 ALERT_FILE = ALERT_DIR / "security_alerts.jsonl"
 
+STATE_DIR = ROOT / "state"
+STATE_FILE = STATE_DIR / "detection_state.json"
+
 ALERT_DIR.mkdir(parents=True, exist_ok=True)
+STATE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_events() -> list[dict]:
+def read_new_events(
+    event_file: Path,
+    offset: int,
+) -> tuple[list[dict], int]:
+    if not event_file.exists():
+        return [], 0
 
-    if not EVENT_FILE.exists():
-        return []
+    file_size = event_file.stat().st_size
+
+    # O arquivo foi truncado ou recriado.
+    if offset > file_size:
+        offset = 0
 
     events: list[dict] = []
 
-    with EVENT_FILE.open("r", encoding="utf-8") as handle:
+    with event_file.open("rb") as handle:
+        handle.seek(offset)
 
-        for line in handle:
+        while True:
+            raw_line = handle.readline()
 
-            line = line.strip()
+            if not raw_line:
+                break
+
+            try:
+                line = raw_line.decode("utf-8").strip()
+            except UnicodeDecodeError:
+                continue
 
             if not line:
                 continue
@@ -41,13 +67,13 @@ def load_events() -> list[dict]:
             except json.JSONDecodeError:
                 continue
 
-    return events
+        new_offset = handle.tell()
+
+    return events, new_offset
 
 
 def append_alert(alert: dict) -> None:
-
     with ALERT_FILE.open("a", encoding="utf-8") as handle:
-
         handle.write(
             json.dumps(
                 alert,
@@ -57,86 +83,133 @@ def append_alert(alert: dict) -> None:
         )
 
 
-def create_fingerprint(alert: dict) -> str:
-
+def compute_alert_id(alert: dict) -> str:
     if alert["alert_type"] == "credential_bruteforce":
-
-        users = ",".join(alert.get("target_users", []))
-
-        return (
-            f"{alert['alert_type']}|"
-            f"{alert['source_ip']}|"
-            f"{users}|"
-            f"{alert['first_seen']}"
+        identity = "|".join(
+            [
+                alert["alert_type"],
+                alert["source_ip"],
+                ",".join(alert.get("target_users", [])),
+                alert["first_seen"],
+            ]
         )
 
-    return (
-        f"{alert['alert_type']}|"
-        f"{alert['source_ip']}|"
-        f"{alert.get('target_user')}|"
-        f"{alert.get('success_time')}"
-    )
+    else:
+        identity = "|".join(
+            [
+                alert["alert_type"],
+                alert["source_ip"],
+                str(alert.get("target_user", "")),
+                str(alert.get("success_time", "")),
+            ]
+        )
+
+    digest = hashlib.sha256(
+        identity.encode("utf-8")
+    ).hexdigest()[:16]
+
+    return f"NV-ALT-{digest.upper()}"
 
 
 def main() -> None:
-
-    print("[NexVigil] Detection Engine v0.1.1")
+    print("[NexVigil] Detection Engine v0.1.2")
     print(f"[NexVigil] Watching: {EVENT_FILE}")
+    print(f"[NexVigil] State: {STATE_FILE}")
 
-    seen_fingerprints: set[str] = set()
+    state = load_state(STATE_FILE)
 
     try:
-
         while True:
+            new_events, new_offset = read_new_events(
+                EVENT_FILE,
+                state["file_offset"],
+            )
 
-            events = load_events()
+            if not new_events:
+                time.sleep(2)
+                continue
 
-            alerts = []
+            correlation_events = (
+                state["recent_events"]
+                + new_events
+            )
+
+            correlation_events = prune_recent_events(
+                correlation_events,
+                retention_seconds=120,
+            )
+
+            alerts: list[dict] = []
 
             alerts.extend(
-                detect_bruteforce(events)
+                detect_bruteforce(correlation_events)
             )
 
             alerts.extend(
-                detect_success_after_failures(events)
+                detect_success_after_failures(
+                    correlation_events
+                )
+            )
+
+            emitted_alert_ids = set(
+                state["emitted_alert_ids"]
             )
 
             for alert in alerts:
+                alert_id = compute_alert_id(alert)
 
-                fingerprint = create_fingerprint(alert)
-
-                if fingerprint in seen_fingerprints:
+                if alert_id in emitted_alert_ids:
                     continue
 
-                seen_fingerprints.add(fingerprint)
+                alert["alert_id"] = alert_id
 
                 append_alert(alert)
 
-                if alert["severity"] == "critical":
+                emitted_alert_ids.add(alert_id)
 
+                if alert["severity"] == "critical":
                     print(
                         "[ALERT] CRITICAL | "
+                        f"{alert_id} | "
                         "Possible Account Compromise | "
                         f"user={alert['target_user']} | "
                         f"source={alert['source_ip']} | "
-                        f"failures={alert['failed_attempts_before_success']}"
+                        f"failures="
+                        f"{alert['failed_attempts_before_success']}"
                     )
 
                 else:
-
                     print(
                         "[ALERT] HIGH | "
+                        f"{alert_id} | "
                         "T1110 Brute Force | "
                         f"source={alert['source_ip']} | "
-                        f"users={','.join(alert['target_users'])} | "
-                        f"attempts={alert['failed_attempts']}"
+                        f"users="
+                        f"{','.join(alert['target_users'])} | "
+                        f"attempts="
+                        f"{alert['failed_attempts']}"
                     )
+
+            state = {
+                "version": 1,
+                "file_offset": new_offset,
+                "recent_events": correlation_events,
+                "emitted_alert_ids": sorted(
+                    emitted_alert_ids
+                ),
+            }
+
+            save_state(
+                STATE_FILE,
+                state,
+            )
 
             time.sleep(2)
 
     except KeyboardInterrupt:
-
-        print("\n[NexVigil] Detection Engine stopped.")
+        print(
+            "\n[NexVigil] Detection Engine stopped safely."
+        )
 
 
 if __name__ == "__main__":
