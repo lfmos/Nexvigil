@@ -1,0 +1,29 @@
+<group name="nexvigil,authentication,">
+
+  <rule id="100100" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="service">nexvigil-lab-api</field>
+    <field name="event_type">authentication</field>
+    <field name="action">login</field>
+    <description>NexVigil - Evento de autenticação</description>
+  </rule>
+
+  <rule id="100101" level="7">
+    <if_sid>100100</if_sid>
+    <field name="result">failed</field>
+    <description>NexVigil - Falha de autenticação detectada</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <rule id="100102" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100101</if_matched_sid>
+    <same_field>source_ip</same_field>
+    <description>NexVigil - Múltiplas falhas de autenticação da mesma origem</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+</group>
