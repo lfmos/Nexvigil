@@ -1,0 +1,6 @@
+{"timestamp": "2026-09-03T15:36:00.860214+00:00", "event_type": "authentication", "action": "login", "result": "failed", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
+{"timestamp": "2026-09-03T15:36:01.165804+00:00", "event_type": "authentication", "action": "login", "result": "failed", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
+{"timestamp": "2026-09-03T15:36:01.468585+00:00", "event_type": "authentication", "action": "login", "result": "failed", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
+{"timestamp": "2026-09-03T15:36:01.771506+00:00", "event_type": "authentication", "action": "login", "result": "failed", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
+{"timestamp": "2026-09-03T15:36:02.074973+00:00", "event_type": "authentication", "action": "login", "result": "failed", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
+{"timestamp": "2026-09-03T15:36:02.378763+00:00", "event_type": "authentication", "action": "login", "result": "success", "username": "analyst@nexvigil.local", "source_ip": "127.0.0.1", "service": "nexvigil-lab-api"}
