@@ -1,0 +1,11 @@
+<!--
+  Exemplo de configuração do Wazuh Agent para coleta
+  da telemetria gerada pelo NexVigil.
+
+  Substitua o caminho abaixo pelo caminho real do projeto.
+-->
+
+<localfile>
+  <location>C:\caminho\para\Nexvigil\logs\security_events.jsonl</location>
+  <log_format>json</log_format>
+</localfile>
