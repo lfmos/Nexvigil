@@ -63,9 +63,9 @@ O NexVigil foi criado para praticar e demonstrar:
                        Response
                            |
                            v
-                       Improvement
-```
+                     Improvement
 
+```
 ---
 
 ## Principais funcionalidades
@@ -387,7 +387,7 @@ Veja também:
 
 ## Status
 
-**NexVigil v1.0**
+**NexVigil v1.0.0**
 
 Validado:
 
