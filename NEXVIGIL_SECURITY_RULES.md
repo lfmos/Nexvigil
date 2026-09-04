@@ -13,7 +13,7 @@ Estas regras são obrigatórias.
 9. Toda entrada externa deve ser validada.
 10. Logs devem remover tokens, senhas e headers sensíveis.
 11. Dependências devem ser verificadas por SCA.
-12. Pipeline deve executar secret scanning e SAST.
+12. O pipeline deve executar testes, SAST e auditoria de dependências; secret scanning permanece uma evolução recomendada.
 13. IA não recebe shell arbitrário.
 14. IA não recebe credenciais administrativas.
 15. IA recomenda; policy engine valida; humano aprova ações críticas.

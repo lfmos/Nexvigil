@@ -1,34 +1,29 @@
-# NexVigil SIEM Integration
+# Integração com Wazuh SIEM
 
-## Overview
+## Visão geral
 
-NexVigil integrates its local security telemetry with Wazuh to demonstrate how application events can enter a Security Information and Event Management workflow.
+O NexVigil combina um Detection Engine desenvolvido em Python com uma integração documentada para o Wazuh SIEM.
 
-The project intentionally keeps the custom NexVigil Detection Engine and the external SIEM as separate components.
+A proposta é demonstrar tanto os fundamentos internos de detecção quanto a utilização de uma plataforma próxima de ambientes reais de SOC.
 
-## Architecture
+## Arquitetura
 
 ```text
-Controlled Attack Simulation
-          |
-          v
-      FastAPI Lab
-          |
-          v
+Simulação Purple Team
+        |
+        v
+    FastAPI Lab
+        |
+        v
 security_events.jsonl
-      |          |
-      |          +------------------+
-      v                             v
-NexVigil Detection Engine      Wazuh Collector
-      |                             |
-      v                             v
-Local Alerts                  Wazuh Manager
-                                    |
-                                    v
-                              Wazuh Indexer
-                                    |
-                                    v
-                              Wazuh Dashboard
-                                    |
-                                    v
-                                SOC Analyst
+     |          |
+     |          |
+     v          v
+NexVigil      Wazuh
+Detection     SIEM
+Engine          |
+     |          |
+     +----+-----+
+          |
+          v
+       Analista

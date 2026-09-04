@@ -1,43 +1,109 @@
-# NexVigil — Tech Stack
+# \# NexVigil — Tech Stack
 
-## Inicial
 
-- Python 3.11+
-- FastAPI
-- Uvicorn
-- JSON Lines para telemetria inicial
-- Pytest
-- Git / GitHub
+# \## Implementado na v1.0.0
 
-## Segurança
 
-- Bandit
-- pip-audit
-- Semgrep
-- Trivy
-- Checkov
-- Gitleaks
-- OWASP ZAP
+# \### Aplicação e Detection Engineering
 
-## Observabilidade / SIEM
 
-- Wazuh
-- Grafana
+# \- Python 3.11+
 
-## Containers
+# \- FastAPI
 
-- Podman preferencialmente
-- Docker como alternativa
+# \- Uvicorn
 
-## IaC / Cloud
+# \- JSON Lines
 
-- Terraform
-- AWS como primeiro provedor
-- arquitetura preparada para Azure/GCP no futuro
+# \- httpx
 
-## IA futura
 
-- Ollama
-- modelo local compatível
-- saída estruturada
-- policy validator
+# \### Testes e DevSecOps
+
+
+# \- Pytest
+
+# \- Bandit
+
+# \- pip-audit
+
+# \- Git
+
+# \- GitHub
+
+# \- GitHub Actions
+
+
+# \### SIEM
+
+
+# \- Wazuh 4.14.7
+
+# \- Wazuh Manager
+
+# \- Wazuh Indexer
+
+# \- Wazuh Dashboard
+
+
+# \### Infraestrutura do laboratório
+
+
+# \- Docker
+
+# \- Docker Compose
+
+# \- WSL2
+
+
+# \## Planejado / Roadmap
+
+
+# As tecnologias abaixo são possibilidades de evolução e não fazem parte da implementação validada da v1.0.0.
+
+
+# \### Segurança adicional
+
+
+# \- Semgrep
+
+# \- Trivy
+
+# \- Checkov
+
+# \- Gitleaks
+
+# \- OWASP ZAP
+
+
+# \### Observabilidade
+
+
+# \- Grafana
+
+
+# \### IaC / Cloud
+
+
+# \- Terraform
+
+# \- AWS
+
+# \- possível expansão futura para Azure/GCP
+
+
+
+# \### AI Security
+
+
+# \- Ollama
+
+# \- LLM local
+
+# \- RAG
+
+# \- structured output
+
+# \- policy validator
+
+# \- human-in-the-loop
