@@ -2,9 +2,7 @@
 
 
 
-\## v1.0 — Core Security Validation Lab
-
-
+\## v1.0.0 — Core Security Validation Lab
 
 Status: Concluído
 
@@ -170,5 +168,5 @@ O roadmap representa possibilidades de evolução e não funcionalidades já imp
 
 
 
-O NexVigil v1.0 permanece utilizável e demonstrável independentemente das futuras extensões.
+O NexVigil v1.0.0 permanece utilizável e demonstrável independentemente das futuras extensões.
 
