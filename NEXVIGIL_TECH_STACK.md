@@ -92,7 +92,6 @@
 # \- possível expansão futura para Azure/GCP
 
 
-
 # \### AI Security
 
 
